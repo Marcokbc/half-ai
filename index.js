@@ -24,9 +24,9 @@ app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 async function analisarPR(pullRequest) {
   const { title, body, html_url, number, diff_url } = pullRequest;
 
-  console.log(diffUrl);
+  console.log(diff_url);
   
-  const diffResponse = await axios.get(diffUrl, {
+  const diffResponse = await axios.get(diff_url, {
     headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
   });
 
