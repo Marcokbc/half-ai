@@ -22,8 +22,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
 async function analisarPR(pullRequest) {
-  const { title, body, html_url, head } = pullRequest;
-  const diffUrl = head.repo.diff_url;
+  const { title, body, html_url, number, diff_url } = pullRequest;
 
   console.log(diffUrl);
   
