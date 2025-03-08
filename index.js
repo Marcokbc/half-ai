@@ -10,6 +10,8 @@ app.use(express.json());
 app.post("/webhook", async (req, res) => {
   const { action, pull_request } = req.body;
 
+  console.log(action);
+
   if (action === "opened" || action === "synchronize") {
     await analisarPR(pull_request);
   }
