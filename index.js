@@ -10,8 +10,6 @@ app.use(express.json());
 app.post("/webhook", async (req, res) => {
   const { action, pull_request } = req.body;
 
-  console.log(action);
-
   if (action === "opened" || action === "synchronize") {
     await analisarPR(pull_request);
   }
@@ -26,6 +24,8 @@ async function analisarPR(pullRequest) {
   const { title, body, html_url, head } = pullRequest;
   const diffUrl = head.repo.diff_url;
 
+  console.log(diffUrl);
+  
   const diffResponse = await axios.get(diffUrl, {
     headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
   });
