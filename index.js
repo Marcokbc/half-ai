@@ -8,6 +8,7 @@ const app = express();
 app.use(express.json());
 
 app.post("/webhook", async (req, res) => {
+  console.log("Payload recebido:", JSON.stringify(req.body, null, 2));
   const { action, pull_request } = req.body;
 
   if (action === "opened" || action === "synchronize") {
