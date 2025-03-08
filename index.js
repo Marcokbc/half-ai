@@ -8,7 +8,6 @@ const app = express();
 app.use(express.json());
 
 app.post("/webhook", async (req, res) => {
-  console.log("Payload recebido:", JSON.stringify(req.body, null, 2));
   const { action, pull_request } = req.body;
 
   if (action === "opened" || action === "synchronize") {
@@ -23,8 +22,6 @@ app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
 async function analisarPR(pullRequest) {
   const { title, body, html_url, number, diff_url } = pullRequest;
-
-  console.log(diff_url);
   
   const diffResponse = await axios.get(diff_url, {
     headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
@@ -53,8 +50,6 @@ async function analisarPR(pullRequest) {
   );
 
   const feedback = response.data.choices[0].message.content;
-
-  console.log(feedback);
 
   await axios.post(
     `${pullRequest.comments_url}`,
