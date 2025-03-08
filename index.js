@@ -52,6 +52,8 @@ async function analisarPR(pullRequest) {
 
   const feedback = response.data.choices[0].message.content;
 
+  console.log(feedback);
+
   await axios.post(
     `${pullRequest.comments_url}`,
     { body: `### Feedback Automático:\n${feedback}` },
