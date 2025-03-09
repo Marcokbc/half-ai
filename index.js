@@ -37,8 +37,18 @@ async function analyzePullRequest(pullRequest) {
         { role: "system", content: "You are an experienced code reviewer." },
         {
           role: "user",
-          content: `Review this Pull Request and provide structured feedback on style, security, and performance. Indicate whether the PR should be approved or not.
-${diff}`,
+          content: `Please review this Pull Request and provide structured feedback on style, security, and performance. Indicate whether the PR should be approved or not.
+                    In this pattern: 
+                    📄Review of file: {File name}
+                    🎨Style:
+                    {Suggestions for improved parts to increase clarity and consistency, if any.}
+                    🔒Security:
+                    {Suggestions for vulnerabilities and insecure practices, if any.}
+                    ⚡️Performance:
+                    {Suggestions for performance improvements, if any}
+
+                  ✅ TechLead Decision: {PR Approved or PR needs adjustments.}
+                  ${diff}`,
         },
       ],
     },
@@ -52,32 +62,9 @@ ${diff}`,
 
   const feedback = response.data.choices[0].message.content;
 
-  const formattedFeedback = `📄 **File Review:** ${title}
-
-🎨 **StyleAgent:**
-${extractFeedbackSection(feedback, "StyleAgent")}
-
-🔒 **SecurityAgent:**
-${extractFeedbackSection(feedback, "SecurityAgent")}
-
-⚡️ **PerformanceAgent:**
-${extractFeedbackSection(feedback, "PerformanceAgent")}
-
-✅ **TechLead Decision:** ${extractApprovalDecision(feedback)}`;
-
   await axios.post(
     pullRequest.comments_url,
-    { body: formattedFeedback },
+    { body: feedback },
     { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` } }
   );
-}
-
-function extractFeedbackSection(feedback, section) {
-  const regex = new RegExp(`(?<=${section}:).*?(?=🔒|⚡️|✅|$)`, "s");
-  const match = feedback.match(regex);
-  return match ? match[0].trim() : "No specific feedback provided.";
-}
-
-function extractApprovalDecision(feedback) {
-  return feedback.includes("approved") ? "PR Approved." : "PR Needs Changes.";
 }
