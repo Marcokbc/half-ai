@@ -30,7 +30,7 @@ async function analyzePullRequest(pullRequest) {
   const diff = diffResponse.data;
 
   const response = await axios.post(
-    process.env.OPENROUTER_API_KEY,
+    process.env.OPENROUTER_URL,
     {
       model: "deepseek/deepseek-chat:free",
       messages: [
