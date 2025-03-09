@@ -37,7 +37,7 @@ async function analyzePullRequest(pullRequest) {
         { role: "system", content: "You are an experienced code reviewer." },
         {
           role: "user",
-          content: `Please review this Pull Request and provide structured feedback on style, security, and performance. Indicate whether the PR should be approved or not.
+          content: `Please review this Pull Request and provide structured feedback on style, security, and performance. Indicate whether the PR should be approved or not, if it has serious errors that represent security risks, very low performance or very poor clean and solid code.
                     In this pattern: 
                     📄Review of file: {File name}
                     🎨Style:
@@ -47,7 +47,7 @@ async function analyzePullRequest(pullRequest) {
                     ⚡️Performance:
                     {Suggestions for performance improvements, if any}
 
-                  ✅ TechLead Decision: {PR Approved or PR needs adjustments.}
+                  TechLead Decision: { ✅ PR Approved or ❌ PR needs adjustments .}
                   ${diff}`,
         },
       ],
