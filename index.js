@@ -51,6 +51,7 @@ async function analyzePullRequest(pullRequest) {
                   ${diff}`,
         },
       ],
+      privacy: "strict",
     },
     {
       headers: {
