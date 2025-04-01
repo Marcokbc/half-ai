@@ -21,10 +21,15 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 async function analyzePullRequest(pullRequest) {
-  const { title, diff_url } = pullRequest;
+  const { title, url } = pullRequest;
+
+  const diff_url = `${url}`;
 
   const diffResponse = await axios.get(diff_url, {
-    headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
+    headers: {
+      Authorization: `token ${process.env.GITHUB_TOKEN}`,
+      Accept: "application/vnd.github.v3.diff",
+    },
   });
 
   const diff = diffResponse.data;
@@ -32,23 +37,35 @@ async function analyzePullRequest(pullRequest) {
   const response = await axios.post(
     process.env.OPENROUTER_URL,
     {
-      model: "deepseek/deepseek-chat:free",
+      model: "deepseek/deepseek-chat-v3-0324:free",
       messages: [
-        { role: "system", content: "You are an experienced code reviewer." },
+        {
+          role: "system",
+          content:
+            "You are an experienced code reviewer, named Gollum-AI. And you must analyze the code style, that is, if it breaks a code pattern; security, that is, if the code leaves a vulnerability or security problem; performance, if the code is anti-performance.",
+        },
         {
           role: "user",
-          content: `Please review this Pull Request and provide structured feedback on style, security, and performance. Indicate whether the PR should be approved or not, if it has serious errors that represent security risks, very low performance or very poor clean and solid code.
-                    In this pattern: 
-                    📄Review of file: {File name}
-                    🎨Style:
-                    {Suggestions for improved parts to increase clarity and consistency, if any.}
-                    🔒Security:
-                    {Suggestions for vulnerabilities and insecure practices, if any.}
-                    ⚡️Performance:
-                    {Suggestions for performance improvements, if any}
+          content: `### Please review this pull request and provide structured feedback on style, security, and performance. Indicate whether the PR should be approved or not. Don't add anything more than what I've stated, just that. Keep the icons as emojis.
 
-                  TechLead Decision: { ✅ PR Approved or ❌ PR needs adjustments .}
-                  ${diff}`,
+          Follow this pattern:
+
+          📄 **Review of file: {File name}**
+          🎨 **Style:**  
+          {Suggestions for improved parts to increase clarity and consistency, if any.}  
+          🔒 **Security:**  
+          {Suggestions for vulnerabilities and insecure practices, if any.}  
+          ⚡ **Performance:**  
+          {Suggestions for performance improvements, if any.}
+
+          **TechLead Decision:** { ✅ PR Approved or ❌ PR needs adjustments. }  
+
+          ---  
+          **Code Diff:**  
+          \`\`\`diff
+          ${diff}
+          \`\`\`
+          `,
         },
       ],
       privacy: "strict",
@@ -66,6 +83,11 @@ async function analyzePullRequest(pullRequest) {
   await axios.post(
     pullRequest.comments_url,
     { body: feedback },
-    { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` } }
+    {
+      headers: {
+        Authorization: `token ${process.env.GITHUB_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+    }
   );
 }
