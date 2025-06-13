@@ -22,7 +22,6 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 async function analyzePullRequest(pullRequest) {
   const { title, url } = pullRequest;
-
   const diff_url = `${url}`;
 
   const diffResponse = await axios.get(diff_url, {
